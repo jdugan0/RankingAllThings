@@ -1,0 +1,49 @@
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX schema: <http://schema.org/>
+SELECT ?item ?itemLabel ?itemDesc ?sitelinks WHERE {
+  ?item wikibase:sitelinks ?sitelinks .
+  FILTER(?sitelinks >= 75)
+  FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 }
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q16334295 }   # group of humans
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q14897293 }   # fictional entity
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q17442446 }   # Wikimedia internal item
+  FILTER NOT EXISTS { ?item wdt:P625 ?coord }
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q11953984}    # linguistic unit
+  FILTER NOT EXISTS { ?item wdt:P31 wd:Q16521}                 # taxon
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q19478619}   # metaclass
+  FILTER NOT EXISTS { ?item wdt:P31 wd:Q14795564 }             # calendar day (June 1, etc.)
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q577 }        # year (2009, etc.)
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q17339814} # chemicals
+  FILTER NOT EXISTS { ?item wdt:P279* wd:Q2545446}    # grapheme (some letters don't have instance of tags...?)
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q42032} # domain
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q11563} #numbers
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q5151}
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q3863 }   # asteroid
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q15056993} #aircraft
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q88392887}
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q179461}
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q838948}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q8142} 
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q15836568}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q67206691}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q512492}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q25295}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q132364}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q13632}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q23038290}
+  FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q36507 }
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q234460}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q131093}
+  FILTER NOT EXISTS {?item wdt:P31/wdt:P279* wd:Q72070508}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q4663903}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q39911}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q578}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q8928}
+  FILTER NOT EXISTS {?item wdt:P31 wd:Q128234}
+  ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en") 
+  OPTIONAL { ?item schema:description ?itemDesc . FILTER(LANG(?itemDesc) = "en") }
+}
+ORDER BY DESC(-?sitelinks)
