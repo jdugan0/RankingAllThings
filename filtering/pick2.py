@@ -1,6 +1,6 @@
 import pandas as pd
 import random
-data = pd.read_csv("data/kept.csv")
+data = pd.read_csv("../datakept.csv")
 
 i1 = random.randint(0, len(data.index) - 1)
 i2 = random.randint(0, len(data.index) - 1)

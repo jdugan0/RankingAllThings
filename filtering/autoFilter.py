@@ -1,5 +1,5 @@
 import pandas as pd
-raw = pd.read_csv("data/raw.csv")
+raw = pd.read_csv("../dataraw.csv")
 auto_removed = []
 auto_kept = []
 for index, row in raw.iterrows():
@@ -8,5 +8,5 @@ for index, row in raw.iterrows():
     else:
         auto_kept.append(row)
 
-pd.DataFrame(auto_kept).to_csv("data/auto_kept.csv", index=False)
-pd.DataFrame(auto_removed).to_csv("data/auto_removed.csv", index=False)
+pd.DataFrame(auto_kept).to_csv("../dataauto_kept.csv", index=False)
+pd.DataFrame(auto_removed).to_csv("../dataauto_removed.csv", index=False)
