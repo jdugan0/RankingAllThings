@@ -44,7 +44,7 @@ def pair():
     row1 = con.execute(
         "SELECT id, label, descr, rating FROM objects ORDER BY RANDOM() LIMIT 1"
     ).fetchone()
-    t = random.gauss(row1["rating"], 85)
+    t = random.gauss(row1["rating"], 40)
     row2 = con.execute(
         "SELECT id, label, descr FROM objects WHERE id != ? ORDER BY abs(rating - ?), RANDOM() LIMIT 1",
         (row1["id"], t)
