@@ -7,9 +7,20 @@ import uuid
 import threading
 vote_lock = threading.Lock()
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 tokens = dict()
+
+from fastapi.responses import FileResponse
+
+@app.get("/")
+def index():
+    return FileResponse("index.html")
+
+@app.get("/script.js")
+def script():
+    return FileResponse("script.js")
+
 
 def glicko_update(old_rating, old_RD, op_rating, op_RD, s):
     q = math.log(10) / 400
@@ -35,7 +46,7 @@ def pair():
     ).fetchone()
     t = random.gauss(row1["rating"], 85)
     row2 = con.execute(
-        "SELECT id, label, descr FROM objects WHERE id != ? ORDER BY abs(rating - ?) LIMIT 1",
+        "SELECT id, label, descr FROM objects WHERE id != ? ORDER BY abs(rating - ?), RANDOM() LIMIT 1",
         (row1["id"], t)
     ).fetchone()
     tokens[token] = {row1["id"], row2["id"]}
