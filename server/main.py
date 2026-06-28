@@ -1,7 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import sqlite3
 import math
+import random
+import uuid
+
+import threading
+vote_lock = threading.Lock()
+
 app = FastAPI()
+
+tokens = dict()
 
 def glicko_update(old_rating, old_RD, op_rating, op_RD, s):
     q = math.log(10) / 400
@@ -20,32 +28,47 @@ def db():
 
 @app.get("/pair")
 def pair():
-    rows = db().execute(
-        "SELECT id, label, descr FROM objects ORDER BY RANDOM() LIMIT 2"
-    ).fetchall()
-    return [dict(r) for r in rows]
+    con = db()
+    token = uuid.uuid4()
+    row1 = con.execute(
+        "SELECT id, label, descr, rating FROM objects ORDER BY RANDOM() LIMIT 1"
+    ).fetchone()
+    t = random.gauss(row1["rating"], 85)
+    row2 = con.execute(
+        "SELECT id, label, descr FROM objects WHERE id != ? ORDER BY abs(rating - ?) LIMIT 1",
+        (row1["id"], t)
+    ).fetchone()
+    tokens[token] = {row1["id"], row2["id"]}
+    con.close()
+    return {'pair': [dict(r) for r in [row1, row2]], 'token' : token}
 
 from pydantic import BaseModel
 
 class Vote(BaseModel):
     winner_id: int
     loser_id: int
+    token: uuid.UUID
     
     
 @app.post("/vote")
 def vote(v : Vote):
     con = db()
     try:
-        winner = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.winner_id,)).fetchone()
-        loser = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.loser_id,)).fetchone()
-        winner_new = glicko_update(winner["rating"], winner["rd"], loser["rating"], loser["rd"], 1)
-        loser_new = glicko_update(loser["rating"], loser["rd"], winner["rating"], winner["rd"], 0)
-        con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (winner_new[0], winner_new[1], v.winner_id))
-        con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (loser_new[0], loser_new[1], v.loser_id))
-        con.execute("INSERT INTO votes (winner_id, loser_id) VALUES (?, ?)", (v.winner_id, v.loser_id))
-        con.commit()
+        with vote_lock:
+            valid = tokens.pop(v.token, None)        # consume on read
+            if valid is None or v.winner_id not in valid or v.loser_id not in valid:
+                raise HTTPException(400)
+            winner = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.winner_id,)).fetchone()
+            loser = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.loser_id,)).fetchone()
+            winner_new = glicko_update(winner["rating"], winner["rd"], loser["rating"], loser["rd"], 1)
+            loser_new = glicko_update(loser["rating"], loser["rd"], winner["rating"], winner["rd"], 0)
+            con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (winner_new[0], winner_new[1], v.winner_id))
+            con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (loser_new[0], loser_new[1], v.loser_id))
+            con.execute("INSERT INTO votes (winner_id, loser_id) VALUES (?, ?)", (v.winner_id, v.loser_id))
+            con.commit()
     except Exception:
         con.rollback()
         raise
     finally:
         con.close()
+    return  {'status': 'ok'}
