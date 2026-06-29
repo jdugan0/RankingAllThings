@@ -45,9 +45,10 @@ def pair():
     con = db()
     token = uuid.uuid4()
     row1 = con.execute(
-        "SELECT id, label, descr, rating, img FROM objects ORDER BY RANDOM() LIMIT 1"
+        "SELECT id, label, descr, rd, rating, img FROM objects ORDER BY RANDOM() LIMIT 1"
     ).fetchone()
-    t = random.gauss(row1["rating"], 40)
+    sigma = 40
+    t = random.gauss(row1["rating"], max(0, sigma - row1["rd"] / 3))
     row2 = con.execute(
         "SELECT id, label, descr, img FROM objects WHERE id != ? ORDER BY abs(rating - ?), RANDOM() LIMIT 1",
         (row1["id"], t)
