@@ -1,17 +1,37 @@
 let item1;
 let item2;
 let token;
-let button1;
-let button2;
+let nextPair = null;
 let busy = false;
-async function loadPair() {
+
+function imgUrl(item) {
+  if (!item.img) return null;
+  return item.img.replace(/^http:\/\//, 'https://') + '?width=300';
+}
+
+function preload(data) {
+  for (const item of data.pair) {
+    const u = imgUrl(item);
+    if (u) {
+      const im = new Image();
+      im.src = u;
+    }
+  }
+  return data;
+}
+
+async function fetchPair() {
   const res = await fetch('/pair');
-  const data = await res.json();
+  return preload(await res.json());
+}
+
+function setPair(data) {
   item1 = data['pair'][0];
   item2 = data['pair'][1];
   token = data['token'];
   render();
 }
+
 async function vote(winnerId, loserId) {
   if (busy) return;
   busy = true;
@@ -21,15 +41,18 @@ async function vote(winnerId, loserId) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({winner_id: winnerId, loser_id: loserId, token})
     });
-    await loadPair();
+    setPair(nextPair || await fetchPair());
+    nextPair = await fetchPair();
   } finally {
     busy = false;
   }
 }
+
 function makeCard(onClick) {
   const card = document.createElement('div');
   card.className = 'card';
   const img = document.createElement('img');
+  img.decoding = 'async';
   const label = document.createElement('h2');
   const desc = document.createElement('p');
   card.append(img, label, desc);
@@ -45,17 +68,24 @@ function render() {
   c1.label.textContent = item1.label;
   c1.desc.textContent = item1.descr;
   c1.img.alt = item1.label;
-  if (item1.img)
-    c1.img.src = item1.img + '?width=300';
+  const u1 = imgUrl(item1);
+  if (u1)
+    c1.img.src = u1;
   else
     c1.img.removeAttribute('src');
 
   c2.label.textContent = item2.label;
   c2.desc.textContent = item2.descr;
   c2.img.alt = item2.label;
-  if (item2.img)
-    c2.img.src = item2.img + '?width=300';
+  const u2 = imgUrl(item2);
+  if (u2)
+    c2.img.src = u2;
   else
     c2.img.removeAttribute('src');
 }
-loadPair();
+
+async function init() {
+  setPair(await fetchPair());
+  nextPair = await fetchPair();
+}
+init();
