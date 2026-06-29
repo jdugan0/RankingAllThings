@@ -45,9 +45,17 @@ function render() {
   c1.label.textContent = item1.label;
   c1.desc.textContent = item1.descr;
   c1.img.alt = item1.label;
+  if (item1.img)
+    c1.img.src = item1.img + '?width=300';
+  else
+    c1.img.removeAttribute('src');
 
   c2.label.textContent = item2.label;
   c2.desc.textContent = item2.descr;
   c2.img.alt = item2.label;
+  if (item2.img)
+    c2.img.src = item2.img + '?width=300';
+  else
+    c2.img.removeAttribute('src');
 }
 loadPair();

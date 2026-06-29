@@ -3,7 +3,7 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX schema: <http://schema.org/>
-SELECT ?item ?itemLabel ?itemDesc ?sitelinks WHERE {
+SELECT ?item ?itemLabel ?itemDesc ?sitelinks ?image WHERE {
   ?item wikibase:sitelinks ?sitelinks .
   FILTER(?sitelinks >= 75)
   FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 }
@@ -45,5 +45,7 @@ SELECT ?item ?itemLabel ?itemDesc ?sitelinks WHERE {
   FILTER NOT EXISTS {?item wdt:P31 wd:Q128234}
   ?item rdfs:label ?itemLabel . FILTER(LANG(?itemLabel) = "en") 
   OPTIONAL { ?item schema:description ?itemDesc . FILTER(LANG(?itemDesc) = "en") }
+  OPTIONAL { ?item wdt:P18 ?image . }
+
 }
 ORDER BY DESC(-?sitelinks)

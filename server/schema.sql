@@ -3,7 +3,8 @@ CREATE TABLE objects (
     label TEXT,
     descr TEXT,
     rating REAL DEFAULT 1500,
-    rd REAL DEFAULT 350
+    rd REAL DEFAULT 350,
+    img TEXT
 );
 
 CREATE TABLE votes (
