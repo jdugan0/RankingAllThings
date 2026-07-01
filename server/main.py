@@ -11,6 +11,34 @@ vote_lock = threading.Lock()
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("THINGS_DB", os.path.join(HERE, "..", "data", "things.db"))
 
+def _git_version():
+    v = os.environ.get("APP_VERSION")
+    if v:
+        return v
+    try:
+        git_dir = os.path.join(HERE, "..", ".git")
+        with open(os.path.join(git_dir, "HEAD")) as f:
+            head = f.read().strip()
+        if not head.startswith("ref:"):
+            return head[:7] 
+        ref = head[5:].strip()
+        ref_path = os.path.join(git_dir, ref)
+        if os.path.exists(ref_path):
+            with open(ref_path) as f:
+                return f.read().strip()[:7]
+        packed = os.path.join(git_dir, "packed-refs")
+        if os.path.exists(packed):
+            with open(packed) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith(("#", "^")) and line.endswith(ref):
+                        return line.split()[0][:7]
+    except Exception:
+        pass
+    return "dev"
+
+APP_VERSION = _git_version()
+
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 tokens = dict()
@@ -91,11 +119,22 @@ def vote(v : Vote):
         con.close()
     return  {'status': 'ok'}
 
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+
+def _serve_html(filename):
+    with open(os.path.join(HERE, filename), "r", encoding="utf-8") as f:
+        html = f.read()
+    for asset in ("style.css", "script.js", "leaderboard.js"):
+        html = html.replace(f'"{asset}"', f'"{asset}?v={APP_VERSION}"')
+    return HTMLResponse(html)
+
+@app.get("/")
+def index():
+    return _serve_html("index.html")
 
 @app.get("/leaderboard")
 def leaderboard():
-    return FileResponse(os.path.join(HERE, "leaderboard.html"))
+    return _serve_html("leaderboard.html")
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
