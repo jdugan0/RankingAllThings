@@ -1,5 +1,5 @@
 async function leaderboard() {
-  const res = await fetch('/leaderboard_rank');
+  const res = await fetch('leaderboard_rank');
   const data = await res.json();
   const container = document.getElementById('leaderboard');
   let i = 0;

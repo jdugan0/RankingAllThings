@@ -21,7 +21,7 @@ function preload(data) {
 }
 
 async function fetchPair() {
-  const res = await fetch('/pair');
+  const res = await fetch('pair');
   return preload(await res.json());
 }
 
@@ -36,7 +36,7 @@ async function vote(winnerId, loserId) {
   if (busy) return;
   busy = true;
   try {
-    await fetch('/vote', {
+    await fetch('vote', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({winner_id: winnerId, loser_id: loserId, token})
