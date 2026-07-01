@@ -1,6 +1,7 @@
+let data;
 async function leaderboard() {
   const res = await fetch('leaderboard_rank');
-  const data = await res.json();
+  data = await res.json();
   const container = document.getElementById('leaderboard');
   let i = 0;
   for (const item of data) {
@@ -16,3 +17,9 @@ async function leaderboard() {
   p.textContent = `${num} votes have decided — these are the best things`;
 }
 leaderboard();
+
+async function reverse() {
+  const container = document.getElementById('leaderboard');
+  const children = Array.from(container.children);
+  children.reverse().forEach(child => container.appendChild(child));
+}
