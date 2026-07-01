@@ -10,6 +10,9 @@ async function leaderboard() {
     container.append(row);
     i++;
   }
-  console.log("meow")
+  const res2 = await fetch('num_votes');
+  const p = document.getElementById('num_votes');
+  const num = await res2.json();
+  p.textContent = `${num} votes have decided — these are the best things`;
 }
 leaderboard();

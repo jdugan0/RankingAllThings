@@ -54,6 +54,12 @@ def leaderboard():
     con.close()
     return [dict(r) for r in rows]
 
+@app.get("/num_votes")
+def num_votes():
+    con = db()
+    num = con.execute("SELECT COUNT(*) AS total_rows FROM votes").fetchone()
+    return num["total_rows"]
+
 from pydantic import BaseModel
 
 class Vote(BaseModel):
