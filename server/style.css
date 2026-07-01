@@ -34,24 +34,46 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
+.nav_buttons {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 10;
+}
+.nav_buttons > a {
+  display: contents;
+}
 .link_button {
-  width: 125px;
-  padding: 0.5rem;
+  min-width: 110px;
+  padding: 0.5rem 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  top: 1%;
-  right: 1%;
-  position: fixed;
   cursor: pointer;
+  text-align: center;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+.link_button p {
+  margin: 0;
 }
 .link_button:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 @media (max-width: 600px) {
-  .link_button {
+  .nav_buttons {
     position: static;
+    flex-direction: row;
+    justify-content: center;
     margin: 0 auto 1.5rem;
+  }
+  .link_button {
+    flex: 1;
+    max-width: 160px;
   }
 }
 .card:hover {
