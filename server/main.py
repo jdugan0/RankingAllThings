@@ -4,6 +4,8 @@ import math
 import random
 import uuid
 import os
+import base64
+import hashlib
 
 import threading
 vote_lock = threading.Lock()
@@ -11,33 +13,13 @@ vote_lock = threading.Lock()
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("THINGS_DB", os.path.join(HERE, "..", "data", "things.db"))
 
-def _git_version():
-    v = os.environ.get("APP_VERSION")
-    if v:
-        return v
-    try:
-        git_dir = os.path.join(HERE, "..", ".git")
-        with open(os.path.join(git_dir, "HEAD")) as f:
-            head = f.read().strip()
-        if not head.startswith("ref:"):
-            return head[:7] 
-        ref = head[5:].strip()
-        ref_path = os.path.join(git_dir, ref)
-        if os.path.exists(ref_path):
-            with open(ref_path) as f:
-                return f.read().strip()[:7]
-        packed = os.path.join(git_dir, "packed-refs")
-        if os.path.exists(packed):
-            with open(packed) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith(("#", "^")) and line.endswith(ref):
-                        return line.split()[0][:7]
-    except Exception:
-        pass
-    return "dev"
-
-APP_VERSION = _git_version()
+def hash(file_path):
+    hasher = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        while chunk := f.read(8192):
+            hasher.update(chunk)  
+    digest = hasher.digest()
+    return base64.urlsafe_b64encode(digest).decode('utf-8')[:12]
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -126,7 +108,7 @@ def _serve_html(filename):
     with open(os.path.join(HERE, filename), "r", encoding="utf-8") as f:
         html = f.read()
     for asset in ("style.css", "script.js", "leaderboard.js"):
-        html = html.replace(f'"{asset}"', f'"{asset}?v={APP_VERSION}"')
+        html = html.replace(f'"{asset}"', f'"{asset}?v={hash(asset)}"')
     return HTMLResponse(html)
 
 @app.get("/")
