@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=$HOME/rank_app
+    - /bin/mkdir -p $DEPLOYPATH/server/tmp $DEPLOYPATH/data
+    - /bin/cp -R server/. $DEPLOYPATH/server/
+    - /bin/rm -rf $DEPLOYPATH/server/__pycache__p
+    - /bin/touch $DEPLOYPATH/server/tmp/restart.txt

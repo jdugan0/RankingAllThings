@@ -3,9 +3,13 @@ import sqlite3
 import math
 import random
 import uuid
+import os
 
 import threading
 vote_lock = threading.Lock()
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get("THINGS_DB", os.path.join(HERE, "..", "data", "things.db"))
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -22,7 +26,7 @@ def glicko_update(old_rating, old_RD, op_rating, op_RD, s):
     return (r_new, rd_new)
 
 def db():
-    con = sqlite3.connect("../data/things.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     return con
 
@@ -86,6 +90,6 @@ from fastapi.staticfiles import StaticFiles
 
 @app.get("/leaderboard")
 def leaderboard():
-    return FileResponse("leaderboard.html")
+    return FileResponse(os.path.join(HERE, "leaderboard.html"))
 
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
