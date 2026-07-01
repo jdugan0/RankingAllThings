@@ -11,20 +11,6 @@ app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 tokens = dict()
 
-from fastapi.responses import FileResponse
-
-@app.get("/")
-def index():
-    return FileResponse("index.html")
-
-@app.get("/script.js")
-def script():
-    return FileResponse("script.js")
-
-@app.get("/style.css")
-def script():
-    return FileResponse("style.css")
-
 def glicko_update(old_rating, old_RD, op_rating, op_RD, s):
     q = math.log(10) / 400
     def g(RD):
@@ -57,6 +43,13 @@ def pair():
     con.close()
     return {'pair': [dict(r) for r in [row1, row2]], 'token' : token}
 
+@app.get("/leaderboard_rank")
+def leaderboard():
+    con = db()
+    rows = con.execute("SELECT label, descr, rating FROM objects ORDER BY rating DESC").fetchall()
+    con.close()
+    return [dict(r) for r in rows]
+
 from pydantic import BaseModel
 
 class Vote(BaseModel):
@@ -87,3 +80,12 @@ def vote(v : Vote):
     finally:
         con.close()
     return  {'status': 'ok'}
+
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+@app.get("/leaderboard")
+def leaderboard():
+    return FileResponse("leaderboard.html")
+
+app.mount("/", StaticFiles(directory=".", html=True), name="static")

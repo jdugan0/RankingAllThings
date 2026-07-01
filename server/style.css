@@ -4,6 +4,12 @@
   justify-content: center;
   align-items: stretch;
 }
+#leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
 body {
   font-family: system-ui, sans-serif;
   max-width: 760px;
@@ -19,6 +25,28 @@ body {
   transition:
     transform 0.1s,
     box-shadow 0.1s;
+}
+
+.leaderboard_card {
+  width: 300px;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.link_button {
+  width: 125px;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  top: 1%;
+  right: 1%;
+  position: fixed;
+  cursor: pointer;
+}
+.link_button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 .card:hover {
   transform: translateY(-3px);
