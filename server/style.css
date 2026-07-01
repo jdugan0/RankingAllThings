@@ -48,6 +48,12 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
+@media (max-width: 600px) {
+  .link_button {
+    position: static;
+    margin: 0 auto 1.5rem;
+  }
+}
 .card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);

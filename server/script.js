@@ -69,19 +69,31 @@ function render() {
   c1.desc.textContent = item1.descr;
   c1.img.alt = item1.label;
   const u1 = imgUrl(item1);
-  if (u1)
+  if (u1) {
     c1.img.src = u1;
-  else
+    c1.img.style.display = 'block';
+  }
+  else {
+    console.log("meow");
     c1.img.removeAttribute('src');
+    c1.img.style.display = 'none';
+  }
+
 
   c2.label.textContent = item2.label;
   c2.desc.textContent = item2.descr;
   c2.img.alt = item2.label;
   const u2 = imgUrl(item2);
-  if (u2)
+  if (u2) {
     c2.img.src = u2;
-  else
+    c2.img.style.display = 'block';
+  }
+
+  else {
     c2.img.removeAttribute('src');
+    c2.img.style.display = 'none';
+    console.log("meow");
+  }
 }
 
 async function init() {
