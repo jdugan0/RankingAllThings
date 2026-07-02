@@ -92,6 +92,8 @@ def vote(v : Vote):
             loser_new = glicko_update(loser["rating"], loser["rd"], winner["rating"], winner["rd"], 0)
             con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (winner_new[0], winner_new[1], v.winner_id))
             con.execute("UPDATE objects SET rating=?, rd=? WHERE id=?", (loser_new[0], loser_new[1], v.loser_id))
+            con.execute("UPDATE objects SET wins = wins + 1, total = total + 1 WHERE id=?", (v.winner_id,))
+            con.execute("UPDATE objects SET total = total + 1 WHERE id=?", (v.loser_id,))
             con.execute("INSERT INTO votes (winner_id, loser_id) VALUES (?, ?)", (v.winner_id, v.loser_id))
             con.commit()
     except Exception:
