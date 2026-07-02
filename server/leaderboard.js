@@ -7,7 +7,7 @@ async function leaderboard() {
   for (const item of data) {
     const row = document.createElement('div');
     row.className = 'leaderboard_card'
-    row.textContent = `${i + 1}. ${item.label} — ${Math.round(item.rating)}`;
+    row.textContent = `${i + 1}. ${item.label} — ${Math.round(item.rating)} — won ${item.wins} / ${item.total} matches`;
     container.append(row);
     i++;
   }
