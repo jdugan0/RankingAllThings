@@ -27,11 +27,26 @@ body {
     box-shadow 0.1s;
 }
 
+.leaderboard_card_content {
+  color : grey;
+  font-style: italic;
+  padding-top: 5%;
+}
+
 .leaderboard_card {
   width: 400px;
   padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+.leaderboard_card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .nav_buttons {
@@ -82,6 +97,14 @@ body {
 }
 .card img {
   width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #eee;
+}
+
+.leaderboard_card_content img {
+  width: 60%;
   aspect-ratio: 3/2;
   object-fit: cover;
   border-radius: 8px;
