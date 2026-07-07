@@ -9,6 +9,9 @@
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 body {
   font-family: system-ui, sans-serif;
@@ -25,10 +28,13 @@ body {
   transition:
     transform 0.1s,
     box-shadow 0.1s;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .leaderboard_card_content {
-  color : grey;
+  color: grey;
   font-style: italic;
   padding-top: 5%;
 }
