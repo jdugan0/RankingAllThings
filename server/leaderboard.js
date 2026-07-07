@@ -32,10 +32,12 @@ function selectCard(card, item) {
   if (selectedCard != null) {
     cardContent.remove();
   }
-  const img = document.createElement('img');
-  img.decoding = 'async';
-  img.src = item.img;
-  row.append(img);
+  if (item.img) {
+    const img = document.createElement('img');
+    img.decoding = 'async';
+    img.src = item.img;
+    row.append(img);
+  }
 
   const text = document.createElement('p');
   text.textContent = `${item.descr}`;
