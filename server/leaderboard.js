@@ -1,6 +1,5 @@
 let data;
 let selectedCard = null;
-let cardContent = null;
 async function leaderboard() {
   const res = await fetch('leaderboard_rank');
   data = await res.json();
@@ -11,7 +10,27 @@ async function leaderboard() {
     row.className = 'leaderboard_card'
     row.textContent = `${i + 1}. ${item.label} — ${
         Math.round(item.rating)} — won ${item.wins} / ${item.total} matches`;
-    row.addEventListener('click', () => selectCard(row, item))
+    // create card content:
+
+    const content = document.createElement('div');
+    content.className = `leaderboard_card_content`
+    const inner = document.createElement('div');
+    inner.className = 'inner';
+    if (item.img) {
+      const img = document.createElement('img');
+      img.decoding = 'async';
+      img.loading = 'lazy';
+      img.src = item.img;
+      inner.append(img);
+    }
+
+    const text = document.createElement('p');
+    text.textContent = `${item.descr}`;
+    inner.append(text);
+    row.append(content);
+    row.addEventListener('click', () => selectCard(content))
+    content.append(inner);
+
     container.append(row);
     i++;
   }
@@ -22,30 +41,12 @@ async function leaderboard() {
 }
 leaderboard();
 
-function selectCard(card, item) {
-  if (selectedCard != null && selectedCard == card) {
-    cardContent.remove();
-    selectedCard = null;
-    return;
+function selectCard(content) {
+  if (selectedCard && selectedCard != content) {
+    selectedCard.classList.remove('open');
   }
-  const row = document.createElement('div');
-  if (selectedCard != null) {
-    cardContent.remove();
-  }
-  if (item.img) {
-    const img = document.createElement('img');
-    img.decoding = 'async';
-    img.src = item.img;
-    row.append(img);
-  }
-
-  const text = document.createElement('p');
-  text.textContent = `${item.descr}`;
-  row.append(text);
-  row.className = `leaderboard_card_content`
-  card.append(row);
-  selectedCard = card;
-  cardContent = row;
+  content.classList.toggle('open');
+  selectedCard = content.classList.contains('open') ? content : null;
 }
 
 async function reverse() {

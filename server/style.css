@@ -36,8 +36,21 @@ body {
 .leaderboard_card_content {
   color: grey;
   font-style: italic;
-  padding-top: 5%;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
 }
+
+.leaderboard_card_content.open {
+  grid-template-rows: 1fr;
+}
+.leaderboard_card_content > .inner {
+  overflow: hidden;
+}
+.leaderboard_card_content > .inner > :first-child {
+  margin-top: 20px;
+}
+
 
 .leaderboard_card {
   width: 400px;
