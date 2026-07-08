@@ -33,6 +33,12 @@ body {
   user-select: none;
 }
 
+.bottom_info_text {
+  color: grey;
+  font-style: italic;
+  bottom: 1rem;
+}
+
 .leaderboard_card_content {
   color: grey;
   font-style: italic;
@@ -50,7 +56,6 @@ body {
 .leaderboard_card_content > .inner > :first-child {
   margin-top: 20px;
 }
-
 
 .leaderboard_card {
   width: 400px;
