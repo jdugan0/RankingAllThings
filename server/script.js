@@ -76,8 +76,11 @@ async function vote(winnerId, loserId) {
       return;
     }
     if (res.status != 429) {
+      document.getElementById('fast_text').style.display = 'none';
       setPair(nextPair || await fetchPair());
       nextPair = await fetchPair();
+    } else {
+      document.getElementById('fast_text').style.display = 'block';
     }
   } finally {
     busy = false;
