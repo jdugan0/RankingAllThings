@@ -28,7 +28,7 @@ def client_ip(request: Request) -> str:
         return cf.strip()
     xff = request.headers.get("x-forwarded-for")
     if xff:
-        return xff.split(",")[0].strip()   # first hop
+        return xff.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
 TS_SECRET = os.environ["SECRET_KEY_TURNSTILE"].encode()
