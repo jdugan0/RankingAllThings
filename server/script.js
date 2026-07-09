@@ -75,7 +75,7 @@ async function vote(winnerId, loserId) {
       turnstile.reset();
       return;
     }
-    if (res.ok) {
+    if (res.status != 429) {
       setPair(nextPair || await fetchPair());
       nextPair = await fetchPair();
     }
