@@ -101,7 +101,7 @@ class Vote(BaseModel):
     token: str
     turnstile: str
     
-    
+TIME = 10 * 60
 @app.post("/vote")
 def vote(v : Vote):
     con = db()
@@ -111,7 +111,7 @@ def vote(v : Vote):
         turnstile = v.turnstile.rsplit('.')
         if (not hmac.compare_digest(sign(turnstile[0]), turnstile[1])):
             raise HTTPException(403)
-        if (int(turnstile[0]) + 10 * 60 <= int(time.time())):
+        if (int(turnstile[0]) + TIME <= int(time.time())):
             raise HTTPException(403)
         sgn = sign(token[0])
         if (not hmac.compare_digest(sgn, token[1])):
@@ -153,6 +153,16 @@ def validate(token : TS_Token):
         return {'token': f'{tok}.{sign(tok)}'}
     else:
         return {'token': None}
+    
+@app.post("/validate_timed_token")
+def validate_timed_token(token : TS_Token):
+    turnstile = token.turnstile.rsplit('.')
+    print(turnstile)
+    if (not hmac.compare_digest(sign(turnstile[0]), turnstile[1])):
+        raise HTTPException(403)
+    if (int(turnstile[0]) + TIME <= int(time.time())):
+        raise HTTPException(403)
+    return  {'status': 'ok'}
     
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles

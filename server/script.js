@@ -43,7 +43,7 @@ async function onTurnstileSuccess(token) {
   ts_token = data.token;
   sessionStorage.setItem('ts', ts_token);
   if (ts_token) {
-    document.getElementById("turnstile-container").style.display = "none";
+    document.getElementById('turnstile-container').style.display = 'none';
     init();
   }
 }
@@ -70,13 +70,15 @@ async function vote(winnerId, loserId) {
       busy = false;
       nextPair = null;
       sessionStorage.removeItem('ts');
-      document.getElementById("turnstile-container").style.display = "block";
-      turnstile.render("#turnstile-container");
+      document.getElementById('turnstile-container').style.display = 'block';
+      turnstile.render('#turnstile-container');
       turnstile.reset();
       return;
     }
-    setPair(nextPair || await fetchPair());
-    nextPair = await fetchPair();
+    if (res.ok) {
+      setPair(nextPair || await fetchPair());
+      nextPair = await fetchPair();
+    }
   } finally {
     busy = false;
   }
@@ -137,11 +139,23 @@ async function init() {
 
 
 // init process:
-const stored = sessionStorage.getItem('ts');
-ts_token = stored;
-if (stored){
-  init();
+async function init_full() {
+  const stored = sessionStorage.getItem('ts');
+  ts_token = stored;
+  if (stored) {
+    const res = await fetch('validate_timed_token', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({turnstile: ts_token})
+    });
+    if (res.ok) {
+      init();
+    } else {
+      turnstile.render('#turnstile-container');
+    }
+  } else {
+    turnstile.render('#turnstile-container');
+  }
 }
-else{
-  turnstile.render("#turnstile-container");
-}
+
+init_full();
