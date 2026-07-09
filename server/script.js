@@ -162,3 +162,4 @@ async function init_full() {
 }
 
 init_full();
+document.getElementById('skip').addEventListener('click', () => init())
