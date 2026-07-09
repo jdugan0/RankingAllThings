@@ -137,6 +137,7 @@ async function init() {
   choices.style.display = 'flex';
   setPair(await fetchPair());
   nextPair = await fetchPair();
+  document.getElementById('skip').style.display = 'block';
 }
 
 
