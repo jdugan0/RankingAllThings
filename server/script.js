@@ -1,8 +1,9 @@
 let item1;
 let item2;
-let token;
+let pair_token;
 let nextPair = null;
 let busy = false;
+let ts_token;
 
 function imgUrl(item) {
   if (!item.img) return null;
@@ -28,19 +29,52 @@ async function fetchPair() {
 function setPair(data) {
   item1 = data['pair'][0];
   item2 = data['pair'][1];
-  token = data['token'];
+  pair_token = data['token'];
   render();
 }
 
+async function onTurnstileSuccess(token) {
+  const res = await fetch('validate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({turnstile: token})
+  });
+  const data = await res.json();
+  ts_token = data.token;
+  sessionStorage.setItem('ts', ts_token);
+  if (ts_token) {
+    document.getElementById("turnstile-container").style.display = "none";
+    init();
+  }
+}
 async function vote(winnerId, loserId) {
   if (busy) return;
   busy = true;
   try {
-    await fetch('vote', {
+    const res = await fetch('vote', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({winner_id: winnerId, loser_id: loserId, token})
+      body: JSON.stringify({
+        winner_id: winnerId,
+        loser_id: loserId,
+        token: pair_token,
+        turnstile: ts_token
+      })
     });
+    if (res.status == 403) {
+      choices.style.display = 'none';
+      pair_token = null;
+      ts_token = null;
+      item1 = null;
+      item2 = null;
+      busy = false;
+      nextPair = null;
+      sessionStorage.removeItem('ts');
+      document.getElementById("turnstile-container").style.display = "block";
+      turnstile.render("#turnstile-container");
+      turnstile.reset();
+      return;
+    }
     setPair(nextPair || await fetchPair());
     nextPair = await fetchPair();
   } finally {
@@ -64,6 +98,7 @@ c2 = makeCard(() => vote(item2.id, item1.id));
 const choices = document.getElementById('choices');
 choices.append(c1.card);
 choices.append(c2.card);
+choices.style.display = 'none';
 function render() {
   c1.label.textContent = item1.label;
   c1.desc.textContent = item1.descr;
@@ -72,9 +107,7 @@ function render() {
   if (u1) {
     c1.img.src = u1;
     c1.img.style.display = 'block';
-  }
-  else {
-    console.log("meow");
+  } else {
     c1.img.removeAttribute('src');
     c1.img.style.display = 'none';
   }
@@ -92,12 +125,23 @@ function render() {
   else {
     c2.img.removeAttribute('src');
     c2.img.style.display = 'none';
-    console.log("meow");
   }
 }
 
 async function init() {
+  choices.style.display = 'flex';
   setPair(await fetchPair());
   nextPair = await fetchPair();
 }
-init();
+
+
+
+// init process:
+const stored = sessionStorage.getItem('ts');
+ts_token = stored;
+if (stored){
+  init();
+}
+else{
+  turnstile.render("#turnstile-container");
+}

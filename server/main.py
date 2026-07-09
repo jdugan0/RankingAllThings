@@ -10,6 +10,27 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("THINGS_DB", os.path.join(HERE, "..", "data", "things.db"))
 
+import requests
+TS_SECRET = os.environ["SECRET_KEY_TURNSTILE"].encode()
+def validate_turnstile(token, remoteip=None):
+    url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+    data = {
+        'secret': TS_SECRET,
+        'response': token
+    }
+
+    if remoteip:
+        data['remoteip'] = remoteip
+
+    try:
+        response = requests.post(url, data=data, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Turnstile validation error: {e}")
+        return {'success': False, 'error-codes': ['internal-error']}
+
 def hash(file_path):
     hasher = hashlib.sha256()
     with open(file_path, 'rb') as f:
@@ -70,6 +91,7 @@ def num_votes():
     num = con.execute("SELECT COUNT(*) AS total_rows FROM votes").fetchone()
     con.close()
     return num["total_rows"]
+    
 
 from pydantic import BaseModel
 
@@ -77,14 +99,20 @@ class Vote(BaseModel):
     winner_id: int
     loser_id: int
     token: str
+    turnstile: str
     
     
 @app.post("/vote")
 def vote(v : Vote):
     con = db()
     try:
+        con.execute("BEGIN IMMEDIATE")
         token = v.token.split(".")
-        
+        turnstile = v.turnstile.rsplit('.')
+        if (not hmac.compare_digest(sign(turnstile[0]), turnstile[1])):
+            raise HTTPException(403)
+        if (int(turnstile[0]) + 10 * 60 <= int(time.time())):
+            raise HTTPException(403)
         sgn = sign(token[0])
         if (not hmac.compare_digest(sgn, token[1])):
             raise HTTPException(400)
@@ -95,7 +123,6 @@ def vote(v : Vote):
         if not ((int(pair[0]) == v.winner_id and int(pair[1]) == v.loser_id) 
                 or (int(pair[1]) == v.winner_id and int(pair[0]) == v.loser_id)):
             raise HTTPException(400)
-        con.execute("BEGIN IMMEDIATE")
         winner = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.winner_id,)).fetchone()
         loser = con.execute("SELECT rating, rd FROM objects WHERE id=?", (v.loser_id,)).fetchone()
         winner_new = glicko_update(winner["rating"], winner["rd"], loser["rating"], loser["rd"], 1)
@@ -113,6 +140,20 @@ def vote(v : Vote):
         con.close()
     return  {'status': 'ok'}
 
+
+class TS_Token(BaseModel):
+    turnstile: str
+
+@app.post("/validate")
+def validate(token : TS_Token):
+    ts = token.turnstile
+    v = validate_turnstile(ts)
+    if (v["success"]):
+        tok = f'{int(time.time())}'
+        return {'token': f'{tok}.{sign(tok)}'}
+    else:
+        return {'token': None}
+    
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 

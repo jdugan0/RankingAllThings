@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="en">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <head>
     <script
       async
@@ -14,8 +16,10 @@
 
       gtag("config", "G-C2P1ETE5B1");
     </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+      defer
+    ></script>
     <script>
       if (
         location.hostname !== "localhost" &&
@@ -40,6 +44,14 @@
       </a>
     </div>
     <div id="choices"></div>
+    <p></p>
+    <div
+      id="turnstile-container"
+      data-sitekey="1x00000000000000000000AA"
+      data-callback="onTurnstileSuccess"
+      data-error-callback="onTurnstileError"
+      data-expired-callback="onTurnstileExpired"
+    ></div>
     <p class="bottom_info_text">This page uses Google Analytics.</p>
 
     <script src="script.js" defer></script>
