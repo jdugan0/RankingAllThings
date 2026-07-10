@@ -145,7 +145,7 @@ def pair():
     return {'pair': [dict(r) for r in [row1, row2]], 'token' : token}
 
 @app.get("/leaderboard_rank")
-def leaderboard():
+def leaderboard_rank():
     con = db()
     rows = con.execute("SELECT label, descr, rating, wins, total, img FROM objects ORDER BY rating DESC").fetchall()
     con.close()
@@ -245,7 +245,11 @@ def index():
     return _serve_html("index.html")
 
 @app.get("/leaderboard")
-def leaderboard():
+def leaderboard_rank():
     return _serve_html("leaderboard.html")
+
+@app.get("/admin")
+def admin():
+    return _serve_html("admin.html")
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")

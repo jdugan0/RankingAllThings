@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      if (
+        location.hostname !== "localhost" &&
+        location.hostname !== "127.0.0.1"
+      ) {
+        document.head.appendChild(
+          Object.assign(document.createElement("base"), { href: "/rank/" }),
+        );
+      }
+    </script>
+    <title>Ranking All Things</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Ranking All Things</h1>
+  </body>
+</html>

@@ -163,4 +163,7 @@ async function init_full() {
 }
 
 init_full();
-document.getElementById('skip').addEventListener('click', () => init())
+document.getElementById('skip').addEventListener('click', () => {
+  setPair(nextPair || await fetchPair());
+  nextPair = await fetchPair();
+})
