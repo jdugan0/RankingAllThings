@@ -163,7 +163,9 @@ async function init_full() {
 }
 
 init_full();
-document.getElementById('skip').addEventListener('click', () => {
+async function load() {
+
   setPair(nextPair || await fetchPair());
   nextPair = await fetchPair();
-})
+}
+document.getElementById('skip').addEventListener('click', () => load());
