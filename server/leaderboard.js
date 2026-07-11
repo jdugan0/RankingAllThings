@@ -11,7 +11,10 @@ async function leaderboard() {
     row.textContent = `${i + 1}. ${item.label} — ${
         Math.round(item.rating)} — won ${item.wins} / ${item.total} matches`;
     if (item.sfw == 0){
-      row.style.color = "red";
+      const NSFW = document.createElement('p');
+      NSFW.style.color = 'RED';
+      NSFW.textContent = "  NSFW";
+      row.append(NSFW);
     }
     // create card content:
 
