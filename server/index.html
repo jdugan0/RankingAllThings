@@ -50,6 +50,16 @@
       data-sitekey="0x4AAAAAADx7uyQkWrTgEhy7"
       data-callback="onTurnstileSuccess"
     ></div>
+    <script>
+      if (
+        location.hostname === "localhost" ||
+        location.hostname === "127.0.0.1"
+      ) {
+        document
+          .getElementById("turnstile-container")
+          .setAttribute("data-sitekey", "1x00000000000000000000AA");
+      }
+    </script>
     <div
       style="
         bottom: 1rem;
@@ -62,6 +72,12 @@
       "
     >
       <div class="link_button" style="display: none" id="skip">Skip</div>
+    </div>
+
+    <div class="bottom_buttons">
+      <div class="link_button" onclick="togglensfw()">
+        <p id = "nsfw_text">Show NSFW</p>
+      </div>
     </div>
 
     <p

@@ -86,6 +86,19 @@ body {
   display: contents;
 }
 
+.bottom_buttons {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 10;
+}
+.bottom_buttons > a {
+  display: contents;
+}
+
 .link_button {
   min-width: 110px;
   padding: 0.5rem 1rem;

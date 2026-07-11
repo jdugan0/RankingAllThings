@@ -4,6 +4,7 @@ let pair_token;
 let nextPair = null;
 let busy = false;
 let ts_token;
+let nsfw = false;
 
 function imgUrl(item) {
   if (!item.img) return null;
@@ -20,9 +21,21 @@ function preload(data) {
   }
   return data;
 }
+function togglensfw() {
+  nsfw = !nsfw;
+  document.getElementById('nsfw_text').textContent =
+      nsfw ? 'Show only SFW' : 'Show NSFW';
+  nextPair = null;
+  load();
+}
+
 
 async function fetchPair() {
-  const res = await fetch('pair');
+  const res = await fetch('pair', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({sfw: !nsfw})
+  });
   return preload(await res.json());
 }
 
@@ -164,7 +177,6 @@ async function init_full() {
 
 init_full();
 async function load() {
-
   setPair(nextPair || await fetchPair());
   nextPair = await fetchPair();
 }

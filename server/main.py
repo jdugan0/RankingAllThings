@@ -6,9 +6,12 @@ import os
 import base64
 import hashlib,hmac
 import time
+from pydantic import BaseModel
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("THINGS_DB", os.path.join(HERE, "..", "data", "things.db"))
+
+LOCAL = os.environ.get("LOCAL") == "1"
 
 import requests
 
@@ -31,7 +34,8 @@ def client_ip(request: Request) -> str:
         return xff.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
-TS_SECRET = os.environ["SECRET_KEY_TURNSTILE"].encode()
+TS_SECRET = (b"1x0000000000000000000000000000000AA" if LOCAL
+             else os.environ["SECRET_KEY_TURNSTILE"].encode())
 def validate_turnstile(token, remoteip=None):
     url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
@@ -58,7 +62,8 @@ def hash(file_path):
             hasher.update(chunk)  
     digest = hasher.digest()
     return base64.urlsafe_b64encode(digest).decode('utf-8')[:12]
-SECRET = os.environ["SECRET_KEY"].encode()
+SECRET = (os.environ.get("SECRET_KEY", "dev-local-secret") if LOCAL
+          else os.environ["SECRET_KEY"]).encode()
 def sign(msg: str) -> str:
     return hmac.new(SECRET, msg.encode(), hashlib.sha256).hexdigest()
 
@@ -136,17 +141,20 @@ def glicko_update(old_rating, old_RD, op_rating, op_RD, s):
     return (r_new, rd_new)
 
 
-@app.get("/pair", dependencies=[Depends(rate_limit("pair", 60))])
-def pair():
+class Pair(BaseModel):
+    sfw : int
+@app.post("/pair", dependencies=[Depends(rate_limit("pair", 60))])
+def pair(x : Pair):
     con = db()
     row1 = con.execute(
-        "SELECT id, label, descr, rd, rating, img FROM objects ORDER BY RANDOM() LIMIT 1"
+    "SELECT id, label, descr, rd, rating, img, sfw FROM objects WHERE (sfw=? OR sfw=1) ORDER BY RANDOM() LIMIT 1", 
+    (x.sfw,)
     ).fetchone()
     sigma = 40
     t = random.gauss(row1["rating"], max(0, sigma - row1["rd"] / 3))
     row2 = con.execute(
-        "SELECT id, label, descr, img FROM objects WHERE id != ? ORDER BY abs(rating - ?), RANDOM() LIMIT 1",
-        (row1["id"], t)
+        "SELECT id, label, descr, img FROM objects WHERE id != ? AND (sfw=? OR sfw=1) ORDER BY abs(rating - ?), RANDOM() LIMIT 1",
+        (row1["id"], x.sfw, t)
     ).fetchone()
     payload = f"{row1['id']},{row2['id']}-{int(time.time())}"
     token = f"{payload}.{sign(payload)}"
@@ -167,8 +175,6 @@ def num_votes():
     con.close()
     return num["total_rows"]
     
-
-from pydantic import BaseModel
 
 class Vote(BaseModel):
     winner_id: int
@@ -257,7 +263,7 @@ def index():
 def leaderboard_rank():
     return _serve_html("leaderboard.html")
 
-ADMIN_KEY = os.environ["ADMIN_KEY"]
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "dev-local-admin") if LOCAL else os.environ["ADMIN_KEY"]
 
 def require_admin(request: Request):
     key = (request.headers.get("authorization") or "").removeprefix("Bearer ")
