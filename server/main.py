@@ -282,6 +282,7 @@ def admin_remove(x : Object):
     con.execute("DELETE FROM objects WHERE id = ?", (x.id,))
     con.commit()
     con.close()
+    return {'message': 'removed'}
     
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
