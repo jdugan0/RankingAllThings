@@ -7,7 +7,7 @@ BASE = "https://justindugan.com/rank"
 # 751722, 2122, 608, 290, 228036, 1212935, 172563, 497
 
 remove =[
-    2122, 608, 290, 228036, 1212935, 172563, 497]
+    ]
 for x in remove:
     payload = {'id': x, 'sfw': 0}
     r = requests.post(BASE + "/admin_setsfw", json=payload, headers=H)

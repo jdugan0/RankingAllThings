@@ -276,6 +276,8 @@ class Object_SFW(BaseModel):
     sfw : int
 class Object(BaseModel):
     id: int
+class Label(BaseModel):
+    label : str
 @app.post("/admin_setsfw", dependencies=[Depends(require_admin), Depends(rate_limit("admin", 20))])
 def admin_setsfw(x : Object_SFW):
     con = db()
@@ -289,6 +291,11 @@ def admin_remove(x : Object):
     con.commit()
     con.close()
     return {'message': 'removed'}
-    
+@app.post("/admin_getid", dependencies=[Depends(require_admin), Depends(rate_limit("admin", 20))])
+def admin_getid(x : Label):
+    con=db()
+    id = con.execute("SELECT id FROM objects WHERE label=?", (x.label,))
+    con.close()
+    return {'id': id}
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
