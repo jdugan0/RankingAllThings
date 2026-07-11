@@ -6,6 +6,8 @@ BASE = "https://justindugan.com/rank"
 #2192288, 5873, 8124, 58, 8401, 8401, 178066, 185529, 131295, 127683, 8396, 234213, 170538, 5873, 14076, 5887, 181784, 8398, 154136
 # 751722, 2122, 608, 290, 228036, 1212935, 172563, 497
 
+id = requests.post(BASE + "/admin_getid", json={'label': 'goddess'}, headers=H)
+print(id)
 remove =[
     ]
 for x in remove:

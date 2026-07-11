@@ -293,9 +293,9 @@ def admin_remove(x : Object):
     return {'message': 'removed'}
 @app.post("/admin_getid", dependencies=[Depends(require_admin), Depends(rate_limit("admin", 20))])
 def admin_getid(x : Label):
-    con=db()
-    id = con.execute("SELECT id FROM objects WHERE label=?", (x.label,))
+    con = db()
+    row = con.execute("SELECT id FROM objects WHERE label=?", (x.label,)).fetchone()
     con.close()
-    return {'id': id}
+    return {'id': row[0] if row else None}
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
