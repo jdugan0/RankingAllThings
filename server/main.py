@@ -156,7 +156,7 @@ def pair():
 @app.get("/leaderboard_rank")
 def leaderboard_rank():
     con = db()
-    rows = con.execute("SELECT label, descr, rating, wins, total, img FROM objects ORDER BY rating DESC").fetchall()
+    rows = con.execute("SELECT label, descr, rating, wins, total, img, sfw FROM objects ORDER BY rating DESC").fetchall()
     con.close()
     return [dict(r) for r in rows]
 

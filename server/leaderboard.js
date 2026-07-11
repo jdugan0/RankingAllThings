@@ -10,6 +10,9 @@ async function leaderboard() {
     row.className = 'leaderboard_card'
     row.textContent = `${i + 1}. ${item.label} — ${
         Math.round(item.rating)} — won ${item.wins} / ${item.total} matches`;
+    if (item.sfw == 0){
+      row.style.color = "red";
+    }
     // create card content:
 
     const content = document.createElement('div');
