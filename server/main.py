@@ -75,6 +75,15 @@ def _init_rate_limits():
     con.close()
 _init_rate_limits()
 
+def _init_sfw():
+    con = db()
+    cols = {r["name"] for r in con.execute("PRAGMA table_info(objects)")}
+    if "sfw" not in cols:
+        con.execute("ALTER TABLE objects ADD COLUMN sfw INT DEFAULT 1")
+    con.close()
+    
+_init_sfw()
+
 WINDOW = 60
 
 def check_rate(ip: str, bucket: str, limit: int):
@@ -248,8 +257,31 @@ def index():
 def leaderboard_rank():
     return _serve_html("leaderboard.html")
 
-@app.get("/admin")
-def admin():
-    return _serve_html("admin.html")
+ADMIN_KEY = os.environ["ADMIN_KEY"]
+
+def require_admin(request: Request):
+    key = (request.headers.get("authorization") or "").removeprefix("Bearer ")
+    if not hmac.compare_digest(key, ADMIN_KEY):
+        raise HTTPException(401)
+    
+    
+class Object_SFW(BaseModel):
+    id: int
+    sfw : int
+class Object(BaseModel):
+    id: int
+@app.post("/admin_setsfw", dependencies=[Depends(require_admin), Depends(rate_limit("admin", 20))])
+def admin_setsfw(x : Object_SFW):
+    con = db()
+    con.execute("UPDATE objects SET SFW = ? WHERE id = ?", (x.sfw, x.id))
+    con.commit()
+    con.close()
+@app.post("/admin_remove", dependencies=[Depends(require_admin), Depends(rate_limit("admin", 20))])
+def admin_remove(x : Object):
+    con = db()
+    con.execute("DELETE FROM objects WHERE id = ?", (x.id,))
+    con.commit()
+    con.close()
+    
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")
