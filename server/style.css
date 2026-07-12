@@ -4,7 +4,8 @@
   justify-content: center;
   align-items: stretch;
 }
-#leaderboard {
+#leaderboard,
+#matchups {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -52,6 +53,7 @@ body {
 }
 .leaderboard_card_content > .inner {
   overflow: hidden;
+  padding: 0 16px 16px;
 }
 .leaderboard_card_content > .inner > :first-child {
   margin-top: 20px;
@@ -106,6 +108,8 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   text-align: center;
+  color: initial;
+  font-style: normal;
   transition:
     transform 0.1s,
     box-shadow 0.1s;

@@ -251,7 +251,7 @@ from fastapi.staticfiles import StaticFiles
 def _serve_html(filename):
     with open(os.path.join(HERE, filename), "r", encoding="utf-8") as f:
         html = f.read()
-    for asset in ("style.css", "script.js", "leaderboard.js"):
+    for asset in ("style.css", "script.js", "leaderboard.js", "matchup.js"):
         html = html.replace(f'"{asset}"', f'"{asset}?v={hash(asset)}"')
     return HTMLResponse(html)
 
@@ -297,5 +297,40 @@ def admin_getid(x : Label):
     row = con.execute("SELECT id FROM objects WHERE label=?", (x.label,)).fetchone()
     con.close()
     return {'id': row[0] if row else None}
+@app.get("/matchups")
+def matchup():
+    return _serve_html("matchup.html")
+@app.get("/get_matchups")
+def get_matchups(label : str):
+    con = db()
+    try:
+        id = con.execute("SELECT id FROM objects WHERE label=?", (label,)).fetchone()[0]
+    except:
+        con.close()
+        return
+    row = con.execute("SELECT winner_id, loser_id FROM votes WHERE winner_id = ? OR loser_id = ?", (id, id)).fetchall()
+    id_to_label = {}
+    dict_ids = {}
+    for x in row:
+        if (x[0] not in id_to_label):
+            id_to_label[x[0]] = con.execute("SELECT label FROM objects WHERE id = ?", (x[0],)).fetchone()[0]
+        if (x[1] not in id_to_label):
+            id_to_label[x[1]] = con.execute("SELECT label FROM objects WHERE id = ?", (x[1],)).fetchone()[0]
+        winner = id_to_label[x[0]]
+        loser = id_to_label[x[1]]
+        if (winner not in dict_ids and winner != label):
+            dict_ids[winner] = [0,0]
+        if (loser not in dict_ids and loser != label):
+            dict_ids[loser] = [0,0]
+        if winner == label:
+            dict_ids[loser][0] += 1
+            dict_ids[loser][1] += 1
+        else:
+            dict_ids[winner][1] += 1
+    con.close()
+    return list(dict_ids.items())
+    
+            
+            
 
 app.mount("/", StaticFiles(directory=HERE, html=True), name="static")

@@ -11,9 +11,9 @@ async function leaderboard() {
     row.textContent = `${i + 1}. ${item.label} — ${
         Math.round(item.rating)} — won ${item.wins} / ${item.total} matches`;
     if (item.sfw == 0){
-      const NSFW = document.createElement('p');
+      const NSFW = document.createElement('div');
       NSFW.style.color = 'RED';
-      NSFW.textContent = "  NSFW";
+      NSFW.textContent = "NSFW";
       row.append(NSFW);
     }
     // create card content:
@@ -33,6 +33,11 @@ async function leaderboard() {
     const text = document.createElement('p');
     text.textContent = `${item.descr}`;
     inner.append(text);
+    const button = document.createElement('div');
+    button.className = 'link_button';
+    button.textContent = 'View Matchups'
+    button.addEventListener('click', () => {window.location.href = `https://justindugan.com/rank/matchups?label=${item.label}`;})
+    inner.append(button);
     row.append(content);
     row.addEventListener('click', () => selectCard(content))
     content.append(inner);
