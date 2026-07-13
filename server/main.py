@@ -316,8 +316,18 @@ def get_matchups(label : str):
             id_to_info[x[0]] = con.execute("SELECT label, img, descr FROM objects WHERE id = ?", (x[0],)).fetchone()
         if (x[1] not in id_to_info):
             id_to_info[x[1]] = con.execute("SELECT label, img, descr FROM objects WHERE id = ?", (x[1],)).fetchone()
-        winner_label, winner_img, winner_descr = id_to_info[x[0]]
-        loser_label, loser_img, loser_descr = id_to_info[x[1]]
+        if (id_to_info[x[0]] != None):
+            winner_label, winner_img, winner_descr = id_to_info[x[0]]
+        else:
+            winner_label = "UNKNOWN"
+            winner_img = None
+            winner_descr = "Object has since been removed."
+        if (id_to_info[x[1]] != None):
+            loser_label, loser_img, loser_descr = id_to_info[x[1]]
+        else:
+            loser_label = "UNKNOWN"
+            loser_img = None
+            loser_descr = "Object has since been removed."
         winner = winner_label
         loser = loser_label
         if (winner not in dict_ids and winner != label):
