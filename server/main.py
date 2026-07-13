@@ -309,19 +309,21 @@ def get_matchups(label : str):
         con.close()
         return
     row = con.execute("SELECT winner_id, loser_id FROM votes WHERE winner_id = ? OR loser_id = ?", (id, id)).fetchall()
-    id_to_label = {}
+    id_to_info = {}
     dict_ids = {}
     for x in row:
-        if (x[0] not in id_to_label):
-            id_to_label[x[0]] = con.execute("SELECT label FROM objects WHERE id = ?", (x[0],)).fetchone()[0]
-        if (x[1] not in id_to_label):
-            id_to_label[x[1]] = con.execute("SELECT label FROM objects WHERE id = ?", (x[1],)).fetchone()[0]
-        winner = id_to_label[x[0]]
-        loser = id_to_label[x[1]]
+        if (x[0] not in id_to_info):
+            id_to_info[x[0]] = con.execute("SELECT label, img, descr FROM objects WHERE id = ?", (x[0],)).fetchone()
+        if (x[1] not in id_to_info):
+            id_to_info[x[1]] = con.execute("SELECT label, img, descr FROM objects WHERE id = ?", (x[1],)).fetchone()
+        winner_label, winner_img, winner_descr = id_to_info[x[0]]
+        loser_label, loser_img, loser_descr = id_to_info[x[1]]
+        winner = winner_label
+        loser = loser_label
         if (winner not in dict_ids and winner != label):
-            dict_ids[winner] = [0,0]
+            dict_ids[winner] = [0, 0, winner_img, winner_descr]
         if (loser not in dict_ids and loser != label):
-            dict_ids[loser] = [0,0]
+            dict_ids[loser] = [0, 0, loser_img, loser_descr]
         if winner == label:
             dict_ids[loser][0] += 1
             dict_ids[loser][1] += 1

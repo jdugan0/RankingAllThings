@@ -6,7 +6,7 @@ BASE = "https://justindugan.com/rank"
 #2192288, 5873, 8124, 58, 8401, 8401, 178066, 185529, 131295, 127683, 8396, 234213, 170538, 5873, 14076, 5887, 181784, 8398, 154136
 # 751722, 2122, 608, 290, 228036, 1212935, 172563, 497
 
-resp = requests.post(BASE + "/admin_getid", json={'label': '2008 United States presidential election'}, headers=H)
+resp = requests.post(BASE + "/admin_getid", json={'label': 'Dragon Ball'}, headers=H)
 id = resp.json()['id']
 print(id)
 remove =[id]
