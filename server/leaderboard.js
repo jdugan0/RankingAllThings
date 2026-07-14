@@ -1,5 +1,6 @@
 let data;
 let selectedCard = null;
+const searchRows = [];
 async function leaderboard() {
   const res = await fetch('leaderboard_rank');
   data = await res.json();
@@ -46,12 +47,20 @@ async function leaderboard() {
     content.append(inner);
 
     container.append(row);
+    searchRows.push({row, key: item.label.toLowerCase()});
     i++;
   }
   const res2 = await fetch('num_votes');
   const p = document.getElementById('num_votes');
   const num = await res2.json();
   p.textContent = `${num} votes have decided — these are the best things`;
+
+  document.getElementById('search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    for (const {row, key} of searchRows) {
+      row.style.display = key.includes(q) ? '' : 'none';
+    }
+  });
 }
 leaderboard();
 

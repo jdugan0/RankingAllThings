@@ -114,6 +114,28 @@ body {
   display: contents;
 }
 
+#search {
+  min-width: 110px;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font: inherit;
+  color: initial;
+  text-align: center;
+  outline: none;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+#search::placeholder {
+  color: grey;
+}
+#search:focus {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
 .link_button {
   min-width: 110px;
   padding: 0.5rem 1rem;

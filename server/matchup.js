@@ -1,4 +1,5 @@
 let selectedCard = null;
+const searchRows = [];
 async function matchups() {
   const label = new URLSearchParams(location.search).get('label');
   const res = await fetch(`get_matchups?label=${label}`);
@@ -13,8 +14,8 @@ async function matchups() {
   for (const item of data) {
     const row = document.createElement('div');
     row.className = 'leaderboard_card';
-    row.innerHTML = `${label} won against <b>${item[0]}</b> ${
-        item[1][0]} / ${item[1][1]} times.`;
+    row.innerHTML = `${label} won against <b>${item[0]}</b> ${item[1][0]} / ${
+        item[1][1]} times.`;
     total += item[1][1];
 
 
@@ -38,9 +39,16 @@ async function matchups() {
     content.append(inner);
 
     container.append(row);
+    searchRows.push({row, key: item[0]});
   }
   document.getElementById('num_votes').textContent =
       `${label} has ${total} votes`
+  document.getElementById('search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    for (const {row, key} of searchRows) {
+      row.style.display = key.includes(q) ? '' : 'none';
+    }
+  });
 }
 function selectCard(content) {
   if (selectedCard && selectedCard != content) {
