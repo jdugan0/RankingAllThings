@@ -14,8 +14,11 @@ async function matchups() {
   for (const item of data) {
     const row = document.createElement('div');
     row.className = 'leaderboard_card';
-    row.innerHTML = `${label} won against <b>${item[0]}</b> ${item[1][0]} / ${
-        item[1][1]} times.`;
+    const opponent = document.createElement('b');
+    opponent.textContent = item[0];
+    row.append(
+        document.createTextNode(`${label} won against `), opponent,
+        document.createTextNode(` ${item[1][0]} / ${item[1][1]} times.`));
     total += item[1][1];
 
 
