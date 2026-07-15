@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      if (
+        location.hostname !== "localhost" &&
+        location.hostname !== "127.0.0.1"
+      ) {
+        document.head.appendChild(
+          Object.assign(document.createElement("base"), { href: "/rank/" }),
+        );
+      }
+    </script>
+    <title>Ranking Your Movies</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Ranking Your Movies</h1>
+    <div class="link_button link_button_large" id="upload" onclick="load_movies()">
+      <p>Upload</p>
+    </div>
+    <input
+      type="file"
+      id="movie_file"
+      accept=".csv"
+      hidden
+      onchange="handle_movie_file(this.files)"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.4/papaparse.min.js"></script>
+    <script src="movies.js" defer></script>
+  </body>
+</html>

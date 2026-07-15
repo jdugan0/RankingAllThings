@@ -251,7 +251,7 @@ from fastapi.staticfiles import StaticFiles
 def _serve_html(filename):
     with open(os.path.join(HERE, filename), "r", encoding="utf-8") as f:
         html = f.read()
-    for asset in ("style.css", "script.js", "leaderboard.js", "matchup.js"):
+    for asset in ("style.css", "script.js", "leaderboard.js", "matchup.js", "movies.js"):
         html = html.replace(f'"{asset}"', f'"{asset}?v={hash(asset)}"')
     return HTMLResponse(html)
 
@@ -300,6 +300,9 @@ def admin_getid(x : Label):
 @app.get("/matchups")
 def matchup():
     return _serve_html("matchup.html")
+@app.get("/movies")
+def movies():
+    return _serve_html("movies.html")
 @app.get("/get_matchups")
 def get_matchups(label : str):
     con = db()

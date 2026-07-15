@@ -156,6 +156,13 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
+.link_button_large {
+  min-width: 160px;
+  padding: 0.85rem 1.75rem;
+  border-radius: 16px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 @media (max-width: 600px) {
   .nav_buttons {
     position: static;
